@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.fullbay.ath.userauthorizer.LambdaHandlerTest" time="1.154" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.fullbay.ath.userauthorizer.LambdaHandlerTest" time="1.206" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="23"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -17,7 +17,7 @@
     <property name="user.country" value="US"/>
     <property name="groovy.use.classvalue" value="false"/>
     <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home/lib"/>
-    <property name="sun.java.command" value="/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire/surefirebooter-20250212182505214_3.jar /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire 2025-02-12T18-25-05_179-jvmRun1 surefire-20250212182505214_1tmp surefire_0-20250212182505214_2tmp"/>
+    <property name="sun.java.command" value="/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire/surefirebooter-20250213143708980_3.jar /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire 2025-02-13T14-37-08_943-jvmRun1 surefire-20250213143708980_1tmp surefire_0-20250213143708980_2tmp"/>
     <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="jdk.debug" value="release"/>
     <property name="maven.home" value="/opt/homebrew/Cellar/maven/3.9.9/libexec"/>
@@ -37,7 +37,7 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="apple.awt.application.name" value="ForkedBooter"/>
-    <property name="surefire.real.class.path" value="/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire/surefirebooter-20250212182505214_3.jar"/>
+    <property name="surefire.real.class.path" value="/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/target/surefire/surefirebooter-20250213143708980_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.runtime.version" value="23.0.2"/>
@@ -52,13 +52,13 @@
     <property name="localRepository" value="/Users/steverhoton/.m2/repository"/>
     <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
     <property name="java.io.tmpdir" value="/var/folders/qt/r4df7l017rqdbwrfd1x5zbj40000gp/T/"/>
-    <property name="quarkus.log.file.path" value="target/quarkus.log"/>
+    <property name="quarkus.log.file.path" value="build/quarkus.log"/>
     <property name="java.version" value="23.0.2"/>
     <property name="java.util.concurrent.ForkJoinPool.common.threadFactory" value="io.quarkus.bootstrap.forkjoin.QuarkusForkJoinWorkerThreadFactory"/>
     <property name="user.dir" value="/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer"/>
     <property name="os.arch" value="aarch64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="com.amazonaws.xray.traceHeader" value="125aed64-bffc-4b29-b64a-594581b853fb"/>
+    <property name="com.amazonaws.xray.traceHeader" value="563d2e80-2bba-4eb6-b551-d97a1c1e9bf8"/>
     <property name="native.encoding" value="UTF-8"/>
     <property name="java.util.logging.manager" value="org.jboss.logmanager.LogManager"/>
     <property name="java.library.path" value="/Users/steverhoton/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
@@ -71,13 +71,13 @@
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="java.class.version" value="67.0"/>
   </properties>
-  <testcase name="testSimpleLambdaSuccess" classname="com.fullbay.ath.userauthorizer.LambdaHandlerTest" time="0.353">
-    <system-out><![CDATA[2025-02-12 18:25:06,005 WARN  [io.net.res.dns.DnsServerAddressStreamProviders] (build-29) Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
-2025-02-12 18:25:06,056 INFO  [io.qua.ama.lam.run.MockEventServer] (build-29) Mock Lambda Event Server Started
-2025-02-12 18:25:06,320 INFO  [io.qua.ama.lam.run.AbstractLambdaPollLoop] (Lambda Thread (TEST)) Listening on: http://localhost:8081/_lambda_/2018-06-01/runtime/invocation/next
-2025-02-12 18:25:06,324 INFO  [io.quarkus] (main) com.fullbay.ath.userauthorizer 1.0-SNAPSHOT on JVM (powered by Quarkus 3.18.2) started in 0.609s. 
-2025-02-12 18:25:06,324 INFO  [io.quarkus] (main) Profile test activated. 
-2025-02-12 18:25:06,324 INFO  [io.quarkus] (main) Installed features: [amazon-lambda, cdi]
+  <testcase name="testSimpleLambdaSuccess" classname="com.fullbay.ath.userauthorizer.LambdaHandlerTest" time="0.38">
+    <system-out><![CDATA[2025-02-13 14:37:09,787 WARN  [io.net.res.dns.DnsServerAddressStreamProviders] (build-11) Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+2025-02-13 14:37:09,842 INFO  [io.qua.ama.lam.run.MockEventServer] (build-11) Mock Lambda Event Server Started
+2025-02-13 14:37:10,119 INFO  [io.qua.ama.lam.run.AbstractLambdaPollLoop] (Lambda Thread (TEST)) Listening on: http://localhost:8081/_lambda_/2018-06-01/runtime/invocation/next
+2025-02-13 14:37:10,123 INFO  [io.quarkus] (main) com.fullbay.ath.userauthorizer 1.0-SNAPSHOT on JVM (powered by Quarkus 3.18.2) started in 0.633s. 
+2025-02-13 14:37:10,123 INFO  [io.quarkus] (main) Profile test activated. 
+2025-02-13 14:37:10,123 INFO  [io.quarkus] (main) Installed features: [amazon-lambda, cdi]
 ]]></system-out>
   </testcase>
 </testsuite>

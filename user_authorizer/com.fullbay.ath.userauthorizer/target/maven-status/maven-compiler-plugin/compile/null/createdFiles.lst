@@ -1,8 +1,8 @@
-io/TokenAuthorizerContext.class
 com/fullbay/ath/userauthorizer/UserAuthorizer.class
 com/fullbay/ath/userauthorizer/InputObject.class
 com/fullbay/ath/userauthorizer/StreamLambda.class
 com/fullbay/ath/userauthorizer/OutputObject.class
 com/fullbay/ath/userauthorizer/UnusedLambda.class
 com/fullbay/ath/userauthorizer/TestLambda.class
+com/fullbay/ath/userauthorizer/TokenAuthorizerContext.class
 com/fullbay/ath/userauthorizer/ProcessingService.class

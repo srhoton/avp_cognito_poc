@@ -3,5 +3,6 @@
 /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/ProcessingService.java
 /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/StreamLambda.java
 /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/TestLambda.java
+/Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/TokenAuthorizerContext.java
 /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/UnusedLambda.java
 /Users/steverhoton/git/avp_cognito_poc/user_authorizer/com.fullbay.ath.userauthorizer/src/main/java/com/fullbay/ath/userauthorizer/UserAuthorizer.java
