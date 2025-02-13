@@ -2,40 +2,60 @@ package com.fullbay.ath.userauthorizer;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse;
-import jakarta.inject.Inject;
+import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1;
+import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.PolicyDocument;
+import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.Statement;
 import jakarta.inject.Named;
-import software.amazon.awssdk.policybuilder.iam.IamConditionOperator;
-import software.amazon.awssdk.policybuilder.iam.IamEffect;
-import software.amazon.awssdk.policybuilder.iam.IamPolicy;
-import software.amazon.awssdk.policybuilder.iam.IamPolicyWriter;
-import software.amazon.awssdk.policybuilder.iam.IamPrincipal;
-import software.amazon.awssdk.policybuilder.iam.IamPrincipalType;
-import software.amazon.awssdk.policybuilder.iam.IamResource;
-import software.amazon.awssdk.policybuilder.iam.IamStatement;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.iam.IamClient;
-import software.amazon.awssdk.services.iam.model.GetPolicyResponse;
-import software.amazon.awssdk.services.iam.model.GetPolicyVersionResponse;
-import software.amazon.awssdk.services.sts.StsClient;
+import java.util.Collections;
 
 @Named("authorizer")
 public class UserAuthorizer
-    implements
-        RequestHandler<APIGatewayCustomAuthorizerEvent, IamPolicyResponse> {
+    implements RequestHandler<TokenAuthorizerContext, IamPolicyResponseV1> {
 
     @Override
-    public IamPolicyResponse handleRequest(
-        APIGatewayCustomAuthorizerEvent event,
+    public IamPolicyResponseV1 handleRequest(
+        TokenAuthorizerContext event,
         Context context
     ) {
-        IamPolicyResponse response = new IamPolicyResponse();
-        String resource = event.getRequestContext().getResourcePath();
-        response.setPrincipalId(
-            event.getRequestContext().getIdentity().toString()
+        String token = event.getAuthorizationToken();
+        String methodArn = event.getMethodArn();
+        String[] arnPartials = methodArn.split(":");
+        String region = arnPartials[3];
+        String awsAccountId = arnPartials[4];
+        String[] apiGatewayArnPartials = arnPartials[5].split("/");
+        String restApiId = apiGatewayArnPartials[0];
+        String stage = apiGatewayArnPartials[1];
+        String httpMethod = apiGatewayArnPartials[2];
+        String resource = ""; // root resource
+        if (apiGatewayArnPartials.length == 4) {
+            resource = apiGatewayArnPartials[3];
+        }
+        Statement allowStatement = IamPolicyResponseV1.allowStatement(
+            "arn:aws:execute-api:" +
+            region +
+            ":" +
+            awsAccountId +
+            ":" +
+            restApiId +
+            "/" +
+            stage +
+            "/" +
+            httpMethod +
+            "/" +
+            resource
         );
+        PolicyDocument policyDocument = PolicyDocument.builder()
+            .withVersion(IamPolicyResponseV1.VERSION_2012_10_17)
+            .withStatement(Collections.singletonList(allowStatement))
+            .build();
 
-        return response;
+        IamPolicyResponseV1 iamPolicyResponse = IamPolicyResponseV1.builder()
+            .withPrincipalId("user|a1b2c3d4")
+            .withPolicyDocument(policyDocument)
+            .withContext(Collections.singletonMap("key", "value"))
+            .withUsageIdentifierKey("usage-key")
+            .build();
+
+        return iamPolicyResponse;
     }
 }

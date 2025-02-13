@@ -1,3 +1,4 @@
+io/TokenAuthorizerContext.class
 com/fullbay/ath/userauthorizer/UserAuthorizer.class
 com/fullbay/ath/userauthorizer/InputObject.class
 com/fullbay/ath/userauthorizer/StreamLambda.class
