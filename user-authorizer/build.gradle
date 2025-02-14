@@ -10,8 +10,7 @@ repositories {
 
 dependencies {
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation 'io.quarkus:quarkus-arc'
-    implementation 'io.quarkus:quarkus-rest'
+    implementation 'io.quarkus:quarkus-amazon-lambda'
     implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.0.0'
     implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '3.15.0'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.1'
