@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.fullbay.ath.LambdaHandlerIT" tests="1" skipped="0" failures="1" errors="0" timestamp="2025-02-14T17:46:32" hostname="Mac" time="0.0">
+  <properties/>
+  <testcase name="initializationError" classname="com.fullbay.ath.LambdaHandlerIT" time="0.0">
+    <failure message="java.lang.IllegalStateException: Unable to locate the artifact metadata file created that must be created by Quarkus in order to run integration tests. Make sure this test is run after the 'quarkusBuild' Gradle task." type="java.lang.IllegalStateException">java.lang.IllegalStateException: Unable to locate the artifact metadata file created that must be created by Quarkus in order to run integration tests. Make sure this test is run after the 'quarkusBuild' Gradle task.
+	at io.quarkus.test.junit.IntegrationTestUtil.readQuarkusArtifactProperties(IntegrationTestUtil.java:413)
+	at io.quarkus.test.junit.QuarkusIntegrationTestExtension.ensureStarted(QuarkusIntegrationTestExtension.java:141)
+	at io.quarkus.test.junit.QuarkusIntegrationTestExtension.beforeAll(QuarkusIntegrationTestExtension.java:127)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+</failure>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
