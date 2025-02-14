@@ -26,6 +26,13 @@ resource "aws_api_gateway_method" "avp_user_method" {
   authorization = "NONE"
 }
 
+resource "aws_api_gateway_integration" "user_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.avp_user_gateway.id
+  resource_id             = aws_api_gateway_resource.avp_user_resource.id
+  http_method             = aws_api_gateway_method.avp_user_method.http_method
+  type                    = "MOCK"
+}
+
 resource "aws_api_gateway_resource" "avp_machine_resource" {
   rest_api_id = aws_api_gateway_rest_api.avp_machine_gateway.id
   parent_id   = aws_api_gateway_rest_api.avp_machine_gateway.root_resource_id
@@ -37,4 +44,11 @@ resource "aws_api_gateway_method" "avp_machine_method" {
   resource_id   = aws_api_gateway_resource.avp_machine_resource.id
   http_method   = "GET"
   authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "machine_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.avp_machine_gateway.id
+  resource_id             = aws_api_gateway_resource.avp_machine_resource.id
+  http_method             = aws_api_gateway_method.avp_machine_method.http_method
+  type                    = "MOCK"
 }
