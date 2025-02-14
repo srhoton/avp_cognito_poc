@@ -4,8 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse.Statement.StatementBuilder;
 import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1;
 import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.PolicyDocument;
 import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.Statement;
@@ -121,6 +119,7 @@ public class UserAuthorizer
                 return false;
             }
             logger.log("JWT token processed successfully");
+            logger.log("JWT claims set: " + claimsSet.toJSONObject());
             logger.log("JWT claims set: " + claimsSet.toJSONObject());
             return true;
         } catch (Exception e) {
