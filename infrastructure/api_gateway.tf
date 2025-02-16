@@ -58,6 +58,6 @@ resource "aws_api_gateway_authorizer" "avp_user_authorizer" {
   rest_api_id            = aws_api_gateway_rest_api.avp_user_gateway.id
   name                   = "avp_user_authorizer"
   authorizer_uri         = aws_lambda_function.user_lambda.invoke_arn
-  authorizer_credentials = aws_iam_role.user_lambda_role.arn
+  authorizer_credentials = aws_iam_role.user_lambda_invocation_role.arn
   type                   = "REQUEST"
 }

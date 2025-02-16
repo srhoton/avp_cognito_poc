@@ -77,8 +77,8 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
   allowed_oauth_flows                  = ["implicit"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  callback_urls                        = ["http://localhost:3000"]
-  logout_urls                          = ["http://localhost:3000"]
+  callback_urls                        = ["https://example.com"]
+  logout_urls                          = ["https://example.com"]
   supported_identity_providers         = ["COGNITO"]
   explicit_auth_flows                  = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_SRP_AUTH"]
 }
@@ -90,8 +90,8 @@ resource "aws_cognito_user_pool_client" "machine_pool_client" {
   allowed_oauth_flows                  = ["implicit"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  callback_urls                        = ["http://localhost:3000"]
-  logout_urls                          = ["http://localhost:3000"]
+  callback_urls                        = ["https://example.com"]
+  logout_urls                          = ["https://example.com"]
   supported_identity_providers         = ["COGNITO"]
   explicit_auth_flows                  = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_SRP_AUTH"]
 }

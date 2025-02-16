@@ -27,6 +27,7 @@ import java.security.Policy;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -48,11 +49,21 @@ public class UserAuthorizer
         String token = headers.get("Authorization");
         logger.log("Received token: " + token);
         logger.log("Token is valid: " + isTokenValid(token, logger));
-        Statement statement = IamPolicyResponseV1.allowStatement(
-            "arn:aws:iam::123456789012:user/example-user"
-        );
+        IamPolicyResponseV1.Statement allowStatement =
+            IamPolicyResponseV1.Statement.builder()
+                .withEffect(IamPolicyResponseV1.ALLOW)
+                .withResource(Collections.singletonList("your-resource"))
+                .withAction(IamPolicyResponseV1.EXECUTE_API_INVOKE)
+                .withCondition(
+                    Collections.singletonMap(
+                        "StringEquals",
+                        Collections.singletonMap("aws:username", "exampleUser")
+                    )
+                )
+                .build();
         PolicyDocument policyDocument = PolicyDocument.builder()
-            .withStatement(Collections.singletonList(statement))
+            .withStatement(Collections.singletonList(allowStatement))
+            .withVersion("2012-10-17")
             .build();
 
         IamPolicyResponseV1 response = IamPolicyResponseV1.builder()
