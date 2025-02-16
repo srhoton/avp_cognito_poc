@@ -15,5 +15,10 @@ resource "aws_lambda_function" "user_lambda" {
     log_group  = aws_cloudwatch_log_group.user_lambda.name
     log_format = "Text"
   }
+  environment {
+    variables = {
+      jwks_uri = "https://cognito-idp.${data.aws_region.current.name}.amazonaws.com/${aws_cognito_user_pool.user_pool.id}/.well-known/jwks.json"
+    }
+  }
   depends_on = [aws_cloudwatch_log_group.user_lambda]
 }
