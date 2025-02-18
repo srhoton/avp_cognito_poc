@@ -20,46 +20,132 @@ resource "aws_verifiedpermissions_schema" "user_schema" {
   policy_store_id = aws_verifiedpermissions_policy_store.user_store.id
   definition {
     value = jsonencode({
-      "USER_NAMESPACE" : {
+      "avpusergateway" : {
+        "entityTypes" : {
+          "User" : {
+            "shape" : {
+              "type" : "Record",
+              "attributes" : {
+                "profile" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "address" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "birthdate" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "gender" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "preferred_username" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "updated_at" : {
+                  "type" : "Long",
+                  "required" : false
+                },
+                "website" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "picture" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "identities" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "sub" : {
+                  "type" : "String",
+                  "required" : true
+                },
+                "phone_number" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "phone_number_verified" : {
+                  "type" : "Boolean",
+                  "required" : false
+                },
+                "zoneinfo" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "custom:Role" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "locale" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "email" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "email_verified" : {
+                  "type" : "Boolean",
+                  "required" : false
+                },
+                "given_name" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "family_name" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "middle_name" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "name" : {
+                  "type" : "String",
+                  "required" : false
+                },
+                "nickname" : {
+                  "type" : "String",
+                  "required" : false
+                }
+              }
+            },
+            "memberOfTypes" : [
+              "UserGroup"
+            ]
+          },
+          "UserGroup" : {
+            "shape" : {
+              "attributes" : {},
+              "type" : "Record"
+            }
+          },
+          "Application" : {
+            "shape" : {
+              "attributes" : {},
+              "type" : "Record"
+            }
+          }
+        },
         "actions" : {
-          "get /" : {
+          "get /avp-user" : {
             "appliesTo" : {
               "context" : {
-                "attributes" : {},
-                "type" : "Record"
+                "type" : "Record",
+                "attributes" : {}
               },
               "principalTypes" : [
                 "User"
               ],
-              "resourceTypes" : []
-            },
-            "memberOf" : []
-          }
-        },
-        "commonTypes" : {
-          "Users" : {
-            "type" : "Record",
-            "attributes" : {
-              "cognito:username" : {
-                "type" : "String",
-                "required" : true
-              },
-              "email" : {
-                "type" : "String",
-                "required" : true
-              },
-              "tenant" : {
-                "type" : "String",
-                "required" : true
-              }
-            }
-          }
-        },
-        "entityTypes" : {
-          "User" : {
-            "memberOfTypes" : [],
-            "shape" : {
-              "type" : "Users"
+              "resourceTypes" : [
+                "Application"
+              ]
             }
           }
         }
@@ -72,7 +158,7 @@ resource "aws_verifiedpermissions_policy" "user_policy" {
   policy_store_id = aws_verifiedpermissions_policy_store.user_store.id
   definition {
     static {
-      statement = "permit(principal == USER_NAMESPACE::User::\"us-west-2_yPRxibyEB|f85183e0-1071-706f-54b0-6b1d69450fdd\", action in [USER_NAMESPACE::Action::\"get /\"], resource);"
+      statement = "permit( principal in avpusergateway::UserGroup::\"us-west-2_yPRxibyEB|ui_pool\", action in [ avpusergateway::Action::\"get /avp-user\" ], resource );"
     }
   }
 }

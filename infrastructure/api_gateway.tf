@@ -34,6 +34,20 @@ resource "aws_api_gateway_integration" "user_integration" {
   type        = "MOCK"
 }
 
+resource "aws_api_gateway_deployment" "user_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.avp_user_gateway.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "user_production_stage" {
+  deployment_id = aws_api_gateway_deployment.user_deployment.id
+  stage_name    = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.avp_user_gateway.id
+}
+
 resource "aws_api_gateway_resource" "avp_machine_resource" {
   rest_api_id = aws_api_gateway_rest_api.avp_machine_gateway.id
   parent_id   = aws_api_gateway_rest_api.avp_machine_gateway.root_resource_id
@@ -60,4 +74,18 @@ resource "aws_api_gateway_authorizer" "avp_user_authorizer" {
   authorizer_uri         = aws_lambda_function.user_lambda.invoke_arn
   authorizer_credentials = aws_iam_role.user_lambda_invocation_role.arn
   type                   = "REQUEST"
+}
+
+resource "aws_api_gateway_deployment" "machine_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.avp_machine_gateway.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "machine_production_stage" {
+  deployment_id = aws_api_gateway_deployment.machine_deployment.id
+  stage_name    = "prod"
+  rest_api_id   = aws_api_gateway_rest_api.avp_machine_gateway.id
 }

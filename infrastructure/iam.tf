@@ -89,6 +89,11 @@ resource "aws_iam_role_policy_attachment" "user_lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+resource "aws_iam_role_policy_attachment" "user_lambda_verified_permissions" {
+  role       = aws_iam_role.user_lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonVerifiedPermissionsReadOnlyAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "user_lambda_invocation_policy_attachment" {
   role       = aws_iam_role.user_lambda_invocation_role.name
   policy_arn = aws_iam_policy.user_lambda_invocation.arn

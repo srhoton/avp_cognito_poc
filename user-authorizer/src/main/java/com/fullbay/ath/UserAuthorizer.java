@@ -3,10 +3,12 @@ package com.fullbay.ath;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.PolicyDocument;
-//import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.Statement;
+//import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1;
+//import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.PolicyDocument;
+import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse;
+import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse.PolicyDocument;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.source.*;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -17,24 +19,36 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.*;
 import com.nimbusds.jwt.proc.*;
 import jakarta.inject.Named;
+import jakarta.json.JsonObject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DrbgParameters.Reseed;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import netscape.javascript.JSObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import software.amazon.awssdk.services.verifiedpermissions.VerifiedPermissionsClient;
+import software.amazon.awssdk.services.verifiedpermissions.model.ActionIdentifier;
+import software.amazon.awssdk.services.verifiedpermissions.model.Decision;
+import software.amazon.awssdk.services.verifiedpermissions.model.EntityIdentifier;
+import software.amazon.awssdk.services.verifiedpermissions.model.IsAuthorizedWithTokenRequest;
+import software.amazon.awssdk.services.verifiedpermissions.model.IsAuthorizedWithTokenResponse;
 
 @Named("authorizer")
 public class UserAuthorizer
     implements
-        RequestHandler<APIGatewayProxyRequestEvent, IamPolicyResponseV1> {
+        RequestHandler<APIGatewayCustomAuthorizerEvent, IamPolicyResponse> {
 
     @Override
-    public IamPolicyResponseV1 handleRequest(
-        APIGatewayProxyRequestEvent event,
+    public IamPolicyResponse handleRequest(
+        APIGatewayCustomAuthorizerEvent event,
         Context context
     ) {
         LambdaLogger logger = context.getLogger();
@@ -42,60 +56,73 @@ public class UserAuthorizer
         logger.log("Received context: " + context.toString());
 
         Map<String, String> headers = event.getHeaders();
-        APIGatewayProxyRequestEvent.ProxyRequestContext requestContext =
+        APIGatewayCustomAuthorizerEvent.RequestContext requestContext =
             event.getRequestContext();
         logger.log("Received request context: " + requestContext.toString());
-        String token = headers.get("Authorization");
+        String token = headers.get("authorization");
         logger.log("Received token: " + token);
+        String path = requestContext.getPath();
+        logger.log("Received path: " + path);
         Boolean tokenValid = isTokenValid(token, logger);
         logger.log("Token is valid: " + tokenValid);
+        Boolean permissionValid = false;
         if (tokenValid) {
-            IamPolicyResponseV1.Statement allowStatement =
-                IamPolicyResponseV1.Statement.builder()
-                    .withEffect(IamPolicyResponseV1.ALLOW)
+            permissionValid = isPermissionValid(token, path, logger);
+            logger.log("Permission is valid: " + permissionValid);
+        }
+        if (tokenValid && permissionValid) {
+            Map<String, Object> contextValues = new HashMap<>();
+            contextValues.put("user", "John Doe");
+            contextValues.put("role", "admin");
+            IamPolicyResponse.Statement statement =
+                IamPolicyResponse.Statement.builder()
+                    .withEffect(IamPolicyResponse.ALLOW)
                     .withResource(
-                        Collections.singletonList(
-                            context.getInvokedFunctionArn()
-                        )
+                        Collections.singletonList(event.getMethodArn())
                     )
-                    .withAction(IamPolicyResponseV1.EXECUTE_API_INVOKE)
+                    .withAction(IamPolicyResponse.EXECUTE_API_INVOKE)
                     .withCondition(
                         Collections.singletonMap(
                             "StringEquals",
                             Collections.singletonMap(
-                                "aws:username",
-                                requestContext.getIdentity().getCaller()
+                                "aws:SourceIp",
+                                "71.112.165.29"
                             )
                         )
                     )
                     .build();
+
             PolicyDocument policyDocument = PolicyDocument.builder()
-                .withStatement(Collections.singletonList(allowStatement))
+                .withStatement(Collections.singletonList(statement))
                 .withVersion("2012-10-17")
                 .build();
 
-            IamPolicyResponseV1 response = IamPolicyResponseV1.builder()
-                .withPrincipalId("example-user")
+            IamPolicyResponse response = IamPolicyResponse.builder()
+                .withPrincipalId("f85183e0-1071-706f-54b0-6b1d69450fdd")
                 .withPolicyDocument(policyDocument)
+                .withContext(contextValues)
                 .build();
+            logger.log("Allow Policy document generated");
+            logger.log(response.toString());
 
             return response;
         } else {
-            IamPolicyResponseV1.Statement denyStatement =
-                IamPolicyResponseV1.Statement.builder()
-                    .withEffect(IamPolicyResponseV1.DENY)
+            IamPolicyResponse.Statement denyStatement =
+                IamPolicyResponse.Statement.builder()
+                    .withEffect(IamPolicyResponse.DENY)
                     .withResource(
                         Collections.singletonList(
                             context.getInvokedFunctionArn()
                         )
                     )
-                    .withAction(IamPolicyResponseV1.EXECUTE_API_INVOKE)
+                    .withAction(IamPolicyResponse.EXECUTE_API_INVOKE)
                     .withCondition(
                         Collections.singletonMap(
                             "StringEquals",
                             Collections.singletonMap(
                                 "aws:username",
-                                requestContext.getIdentity().getCaller()
+                                //requestContext.getIdentity().getCaller()
+                                "foo"
                             )
                         )
                     )
@@ -105,11 +132,13 @@ public class UserAuthorizer
                 .withVersion("2012-10-17")
                 .build();
 
-            IamPolicyResponseV1 response = IamPolicyResponseV1.builder()
+            IamPolicyResponse response = IamPolicyResponse.builder()
                 .withPrincipalId("example-user")
                 .withPolicyDocument(policyDocument)
                 .build();
 
+            logger.log("Deny Policy document generated");
+            logger.log(response.toString());
             return response;
         }
     }
@@ -152,6 +181,7 @@ public class UserAuthorizer
             JWTClaimsSet claimsSet;
             SecurityContext ctx = null;
             claimsSet = jwtProcessor.process(accessToken, ctx);
+            logger.log("Received claims set: " + claimsSet.toString());
             //JWT jwt = JWTParser.parse(accessToken);
         } catch (ParseException e) {
             logger.log("Invalid JWT encoding");
@@ -176,5 +206,57 @@ public class UserAuthorizer
         }
         logger.log("Token is valid");
         return true;
+    }
+
+    private Boolean isPermissionValid(
+        String token,
+        String path,
+        LambdaLogger logger
+    ) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        logger.log("Instantiating VerifiedPermissionsClient");
+        try {
+            VerifiedPermissionsClient client =
+                VerifiedPermissionsClient.builder().build();
+
+            ActionIdentifier action = ActionIdentifier.builder()
+                .actionId("get /avp-user")
+                .actionType("avpusergateway::Action")
+                .build();
+            EntityIdentifier entity = EntityIdentifier.builder()
+                .entityId("avpusergateway")
+                .entityType("avpusergateway::Application")
+                .build();
+            logger.log(entity.toString());
+            logger.log(entity.entityId());
+            logger.log(entity.entityType());
+            IsAuthorizedWithTokenRequest request =
+                IsAuthorizedWithTokenRequest.builder()
+                    .policyStoreId("KjTXQVR2Wv2rrhtwMh2akc")
+                    .identityToken(token)
+                    .action(action)
+                    .resource(entity)
+                    .build();
+
+            logger.log("Finished request");
+            logger.log("Dumping request");
+            logger.log(request.toString());
+            logger.log("Finished dumping request");
+
+            IsAuthorizedWithTokenResponse response =
+                client.isAuthorizedWithToken(request);
+            if (response.decision().equals(Decision.ALLOW)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            logger.log("Error occurred while checking permission");
+            logger.log("Error message: " + e.getMessage());
+            e.printStackTrace(pw);
+            logger.log("Stack trace: " + sw.toString());
+            return false;
+        }
     }
 }
