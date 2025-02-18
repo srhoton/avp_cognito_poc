@@ -32,6 +32,13 @@ resource "aws_api_gateway_integration" "user_integration" {
   resource_id = aws_api_gateway_resource.avp_user_resource.id
   http_method = aws_api_gateway_method.avp_user_method.http_method
   type        = "MOCK"
+  request_templates = {
+    "application/json" = jsonencode(
+      {
+        statusCode = 200
+      }
+    )
+  }
 }
 
 resource "aws_api_gateway_deployment" "user_deployment" {

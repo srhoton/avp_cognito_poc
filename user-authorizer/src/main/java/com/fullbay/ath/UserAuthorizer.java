@@ -4,11 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayCustomAuthorizerEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-//import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1;
-//import com.amazonaws.services.lambda.runtime.events.IamPolicyResponseV1.PolicyDocument;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse;
-import com.amazonaws.services.lambda.runtime.events.IamPolicyResponse.PolicyDocument;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.jwk.source.*;
 import com.nimbusds.jose.proc.BadJOSEException;
@@ -19,21 +14,14 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.*;
 import com.nimbusds.jwt.proc.*;
 import jakarta.inject.Named;
-import jakarta.json.JsonObject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.DrbgParameters.Reseed;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import netscape.javascript.JSObject;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import software.amazon.awssdk.services.verifiedpermissions.VerifiedPermissionsClient;
 import software.amazon.awssdk.services.verifiedpermissions.model.ActionIdentifier;
 import software.amazon.awssdk.services.verifiedpermissions.model.Decision;
@@ -43,11 +31,10 @@ import software.amazon.awssdk.services.verifiedpermissions.model.IsAuthorizedWit
 
 @Named("authorizer")
 public class UserAuthorizer
-    implements
-        RequestHandler<APIGatewayCustomAuthorizerEvent, IamPolicyResponse> {
+    implements RequestHandler<APIGatewayCustomAuthorizerEvent, AuthPolicy> {
 
     @Override
-    public IamPolicyResponse handleRequest(
+    public AuthPolicy handleRequest(
         APIGatewayCustomAuthorizerEvent event,
         Context context
     ) {
@@ -71,75 +58,56 @@ public class UserAuthorizer
             logger.log("Permission is valid: " + permissionValid);
         }
         if (tokenValid && permissionValid) {
-            Map<String, Object> contextValues = new HashMap<>();
-            contextValues.put("user", "John Doe");
-            contextValues.put("role", "admin");
-            IamPolicyResponse.Statement statement =
-                IamPolicyResponse.Statement.builder()
-                    .withEffect(IamPolicyResponse.ALLOW)
-                    .withResource(
-                        Collections.singletonList(event.getMethodArn())
-                    )
-                    .withAction(IamPolicyResponse.EXECUTE_API_INVOKE)
-                    .withCondition(
-                        Collections.singletonMap(
-                            "StringEquals",
-                            Collections.singletonMap(
-                                "aws:SourceIp",
-                                "71.112.165.29"
-                            )
-                        )
-                    )
-                    .build();
-
-            PolicyDocument policyDocument = PolicyDocument.builder()
-                .withStatement(Collections.singletonList(statement))
-                .withVersion("2012-10-17")
-                .build();
-
-            IamPolicyResponse response = IamPolicyResponse.builder()
-                .withPrincipalId("f85183e0-1071-706f-54b0-6b1d69450fdd")
-                .withPolicyDocument(policyDocument)
-                .withContext(contextValues)
-                .build();
             logger.log("Allow Policy document generated");
-            logger.log(response.toString());
-
-            return response;
+            String methodArn = event.getMethodArn();
+            String[] arnPartials = methodArn.split(":");
+            String region = arnPartials[3];
+            String awsAccountId = arnPartials[4];
+            String[] apiGatewayArnPartials = arnPartials[5].split("/");
+            String restApiId = apiGatewayArnPartials[0];
+            String stage = apiGatewayArnPartials[1];
+            String httpMethod = apiGatewayArnPartials[2];
+            String resource = ""; // root resource
+            String principalId = "f85183e0-1071-706f-54b0-6b1d69450fdd";
+            if (apiGatewayArnPartials.length == 4) {
+                resource = apiGatewayArnPartials[3];
+            }
+            AuthPolicy authPolicy = new AuthPolicy(
+                principalId,
+                AuthPolicy.PolicyDocument.getAllowAllPolicy(
+                    region,
+                    awsAccountId,
+                    restApiId,
+                    stage
+                )
+            );
+            logger.log(authPolicy.toString());
+            return authPolicy;
         } else {
-            IamPolicyResponse.Statement denyStatement =
-                IamPolicyResponse.Statement.builder()
-                    .withEffect(IamPolicyResponse.DENY)
-                    .withResource(
-                        Collections.singletonList(
-                            context.getInvokedFunctionArn()
-                        )
-                    )
-                    .withAction(IamPolicyResponse.EXECUTE_API_INVOKE)
-                    .withCondition(
-                        Collections.singletonMap(
-                            "StringEquals",
-                            Collections.singletonMap(
-                                "aws:username",
-                                //requestContext.getIdentity().getCaller()
-                                "foo"
-                            )
-                        )
-                    )
-                    .build();
-            PolicyDocument policyDocument = PolicyDocument.builder()
-                .withStatement(Collections.singletonList(denyStatement))
-                .withVersion("2012-10-17")
-                .build();
-
-            IamPolicyResponse response = IamPolicyResponse.builder()
-                .withPrincipalId("example-user")
-                .withPolicyDocument(policyDocument)
-                .build();
-
-            logger.log("Deny Policy document generated");
-            logger.log(response.toString());
-            return response;
+            String methodArn = event.getMethodArn();
+            String[] arnPartials = methodArn.split(":");
+            String region = arnPartials[3];
+            String awsAccountId = arnPartials[4];
+            String[] apiGatewayArnPartials = arnPartials[5].split("/");
+            String restApiId = apiGatewayArnPartials[0];
+            String stage = apiGatewayArnPartials[1];
+            String httpMethod = apiGatewayArnPartials[2];
+            String resource = ""; // root resource
+            String principalId = "f85183e0-1071-706f-54b0-6b1d69450fdd";
+            if (apiGatewayArnPartials.length == 4) {
+                resource = apiGatewayArnPartials[3];
+            }
+            AuthPolicy authPolicy = new AuthPolicy(
+                principalId,
+                AuthPolicy.PolicyDocument.getAllowAllPolicy(
+                    region,
+                    awsAccountId,
+                    restApiId,
+                    stage
+                )
+            );
+            logger.log(authPolicy.toString());
+            return authPolicy;
         }
     }
 
