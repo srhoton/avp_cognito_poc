@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-amazon-lambda'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.0.0'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '3.15.0'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.1'
+    implementation group: 'software.amazon.awssdk', name: 'verifiedpermissions', version: '2.30.21'
+    implementation group: 'org.json', name: 'json', version: '20250107'
+    implementation 'commons-logging:commons-logging:1.2'
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.rest-assured:rest-assured'
+}
+
+group 'com.fullbay.ath'
+version '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
